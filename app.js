@@ -6,7 +6,7 @@ const SESSION_KEY = 'peerlearnConnectDemoSession';
 let currentUser = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
 let authMode = 'signup';
 const skills = [
- {title:'Python Programming',category:'Technology',level:'Beginner friendly',teacher:'Ananya Sharma',initials:'AS',icon:'⌘',description:'Build a strong foundation in Python, functions, and problem solving.'},
+ {title:'Python Programming',category:'Technology',level:'Beginner friendly',teacher:currentUser?.name || 'You',initials:((currentUser?.name || 'U').split(/\s+/).map(s=>s[0]).join('').slice(0,2).toUpperCase()),icon:'⌘',description:'Build a strong foundation in Python, functions, and problem solving.'},
  {title:'UI/UX Design',category:'Design',level:'Intermediate',teacher:'Rohan Mehta',initials:'RM',icon:'✎',description:'Explore wireframes, design systems, and user-centred thinking.'},
  {title:'Public Speaking',category:'Communication',level:'All levels',teacher:'Meera Rao',initials:'MR',icon:'◉',description:'Practise clear presentations and speak with more confidence.'},
  {title:'Web Development',category:'Technology',level:'Beginner friendly',teacher:'Kiran Patel',initials:'KP',icon:'⌘',description:'Learn HTML, CSS, and JavaScript by building small projects.'},
