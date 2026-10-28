@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="PeerLearn Connect — learn together and share your skills.">
+  <title>PeerLearn Connect</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="PeerLearn Connect home"><span class="brand-mark">P</span> PeerLearn <b>Connect</b></a>
+    <nav class="topnav" aria-label="Main navigation">
+      <button class="nav-link active" data-page="dashboard">Dashboard</button>
+      <button class="nav-link" data-page="skills">Explore skills</button>
+      <button class="nav-link" data-page="requests">Requests</button>
+    </nav>
+    <button class="avatar" id="profileButton" aria-label="Open profile">AS</button>
+  </header>
+  <div class="layout">
+    <aside class="sidebar">
+      <p class="side-label">WORKSPACE</p>
+      <button class="side-link selected" data-page="dashboard">◫ <span>Overview</span></button>
+      <button class="side-link" data-page="skills">⌕ <span>Find a skill</span></button>
+      <button class="side-link" data-page="my-skills">✦ <span>My skills</span></button>
+      <button class="side-link" data-page="requests">↔ <span>Learning requests</span></button>
+      <button class="side-link" data-page="exchanges">◎ <span>My exchanges</span></button>
+      <button class="side-link" data-page="profile">♙ <span>Profile</span></button>
+      <div class="sidebar-note">
+        <div class="note-icon">✧</div>
+        <strong>Learning is better together.</strong>
+        <p>Share what you know. Discover what you can learn.</p>
+      </div>
+    </aside>
+    <main id="app" class="main" tabindex="-1"></main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>
