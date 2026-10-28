@@ -19,7 +19,7 @@ let requests = [
  {title:'Practise public speaking',person:'Meera Rao',initials:'MR',status:'Pending'}
 ];
 const exchanges = [
- {title:'Python Programming',person:'Ananya Sharma',progress:60,next:'Practise lists and dictionaries'},
+ {title:'Python Programming',person:currentUser?.name || 'Learner',progress:60,next:'Practise lists and dictionaries'},
  {title:'UI/UX Design',person:'Rohan Mehta',progress:35,next:'Create a low-fidelity wireframe'},
  {title:'Public Speaking',person:'Meera Rao',progress:100,next:'Completed — great work!'}
 ];
@@ -74,7 +74,7 @@ function renderProfile(){
 function render(){document.querySelectorAll('[data-page]').forEach(b=>b.classList.toggle('selected',b.dataset.page===currentPage));document.querySelectorAll('.nav-link').forEach(b=>b.classList.toggle('active',b.dataset.page===currentPage));({dashboard:renderDashboard,skills:renderSkills,'my-skills':renderMySkills,requests:renderRequests,exchanges:renderExchanges,profile:renderProfile}[currentPage]||renderDashboard)();app.focus({preventScroll:true});}
 document.addEventListener('click',e=>{
  const page=e.target.closest('[data-page]');if(page){currentPage=page.dataset.page;render();return;}
- const req=e.target.closest('[data-request]');if(req){requests.unshift({title:'Learn '+req.dataset.request,person:'Ananya Sharma',initials:'AS',status:'Pending'});showToast('Demo learning request created');return;}
+ const req=e.target.closest('[data-request]');if(req){requests.unshift({title:'Learn '+req.dataset.request,person:currentUser?.name || 'Learner',initials:'AS',status:'Pending'});showToast('Demo learning request created');return;}
  const accept=e.target.closest('[data-accept]');if(accept){requests[+accept.dataset.accept].status='Accepted';showToast('Request accepted');renderRequests();return;}
  const decline=e.target.closest('[data-decline]');if(decline){requests.splice(+decline.dataset.decline,1);showToast('Request declined');renderRequests();return;}
  const remove=e.target.closest('[data-remove]');if(remove){showToast('Removal is simulated in this prototype');return;}
