@@ -1,6 +1,10 @@
 const app = document.getElementById('app');
 const toast = document.getElementById('toast');
 let currentPage = 'dashboard';
+const AUTH_KEY = 'peerlearnConnectDemoUsers';
+const SESSION_KEY = 'peerlearnConnectDemoSession';
+let currentUser = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+let authMode = 'signup';
 const skills = [
  {title:'Python Programming',category:'Technology',level:'Beginner friendly',teacher:'Ananya Sharma',initials:'AS',icon:'⌘',description:'Build a strong foundation in Python, functions, and problem solving.'},
  {title:'UI/UX Design',category:'Design',level:'Intermediate',teacher:'Rohan Mehta',initials:'RM',icon:'✎',description:'Explore wireframes, design systems, and user-centred thinking.'},
@@ -19,6 +23,23 @@ const exchanges = [
  {title:'UI/UX Design',person:'Rohan Mehta',progress:35,next:'Create a low-fidelity wireframe'},
  {title:'Public Speaking',person:'Meera Rao',progress:100,next:'Completed — great work!'}
 ];
+function getDemoUsers(){try{return JSON.parse(localStorage.getItem(AUTH_KEY)||'[]')}catch{return []}}
+function setAuthMode(mode){authMode=mode;renderAuth();}
+function renderAuth(){
+ document.body.classList.add('auth-mode');
+ const loggedIn=!!currentUser;
+ document.getElementById('accountActions').style.display=loggedIn?'flex':'none';
+ app.innerHTML=`<section class="auth-shell"><div class="auth-intro"><span class="brand-mark">P</span><div class="eyebrow" style="color:#e0e8ff">PEERLEARN CONNECT</div><h1>Learn together.<br>Grow together.</h1><p>Connect with fellow learners, exchange skills, and turn curiosity into confidence.</p><div class="auth-points"><span>✓ Discover skills from your peers</span><span>✓ Share what you already know</span><span>✓ Keep your learning journey organised</span></div></div><div class="auth-card"><div class="auth-tabs"><button type="button" data-auth-mode="login" class="${authMode==='login'?'active':''}">Log in</button><button type="button" data-auth-mode="signup" class="${authMode==='signup'?'active':''}">Sign up</button></div><h2>${authMode==='signup'?'Create your account':'Welcome back'}</h2><p class="auth-subtitle">${authMode==='signup'?'Join the community and start learning from your peers.':'Log in to continue your learning journey.'}</p><form id="authForm" class="auth-form">${authMode==='signup'?'<div class="form-field"><label for="authName">Full name</label><input id="authName" name="name" autocomplete="name" placeholder="Enter your name" required maxlength="70"></div>':''}<div class="form-field"><label for="authEmail">Email address</label><input id="authEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com" required></div><div class="form-field"><label for="authPassword">Password</label><input id="authPassword" name="password" type="password" autocomplete="${authMode==='signup'?'new-password':'current-password'}" minlength="6" placeholder="At least 6 characters" required></div><div id="authError" class="auth-error" role="alert"></div><button class="primary" type="submit">${authMode==='signup'?'Create account':'Log in'}</button></form><p class="auth-switch">${authMode==='signup'?'Already have an account?':'New to PeerLearn Connect?'} <button type="button" data-auth-mode="${authMode==='signup'?'login':'signup'}">${authMode==='signup'?'Log in':'Sign up'}</button></p><p class="auth-note">Prototype note: this static demo stores account details only in this browser. It is not secure production authentication. Do not use a real or reused password.</p></div></section>`;
+ document.querySelectorAll('[data-auth-mode]').forEach(b=>b.addEventListener('click',()=>setAuthMode(b.dataset.authMode)));
+ document.getElementById('authForm').addEventListener('submit',handleAuthSubmit);
+}
+async function passwordDigest(password){if(window.crypto&&crypto.subtle){const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(password));return Array.from(new Uint8Array(bytes)).map(b=>b.toString(16).padStart(2,'0')).join('')}return password;}
+async function handleAuthSubmit(e){e.preventDefault();const email=document.getElementById('authEmail').value.trim().toLowerCase();const password=document.getElementById('authPassword').value;const users=getDemoUsers();const error=document.getElementById('authError');
+ if(authMode==='signup'){const name=document.getElementById('authName').value.trim();if(users.some(u=>u.email===email)){error.textContent='An account with this email already exists. Please log in.';return}const user={name,email,passwordDigest:await passwordDigest(password)};users.push(user);localStorage.setItem(AUTH_KEY,JSON.stringify(users));currentUser={name,email};localStorage.setItem(SESSION_KEY,JSON.stringify(currentUser));enterApp();showToast('Account created for this demo');return}
+ const user=users.find(u=>u.email===email);if(!user||user.passwordDigest!==await passwordDigest(password)){error.textContent='Email or password is incorrect. If this is your first time, please sign up.';return}currentUser={name:user.name,email:user.email};localStorage.setItem(SESSION_KEY,JSON.stringify(currentUser));enterApp();showToast('Logged in successfully');
+}
+function enterApp(){document.body.classList.remove('auth-mode');document.getElementById('accountActions').style.display='flex';document.getElementById('profileButton').hidden=false;document.getElementById('logoutButton').hidden=false;document.querySelector('.topnav').style.display='flex';document.querySelector('.sidebar').style.display='flex';document.getElementById('profileButton').textContent=(currentUser.name||'U').split(/\s+/).map(s=>s[0]).join('').slice(0,2).toUpperCase();currentPage='dashboard';render();}
+function logout(){currentUser=null;localStorage.removeItem(SESSION_KEY);authMode='login';document.getElementById('profileButton').hidden=true;document.getElementById('logoutButton').hidden=true;renderAuth();}
 function showToast(message){toast.textContent=message;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2400)}
 function head(kicker,title,description,button=''){return `<div class="page-head"><div><div class="eyebrow">${kicker}</div><h1>${title}</h1><p>${description}</p></div>${button}</div>`}
 function skillCard(s,buttonLabel='View details'){return `<article class="skill-card"><div class="skill-icon">${s.icon}</div><h3>${s.title}</h3><p>${s.description}</p><div class="skill-meta"><span>${s.teacher}</span><span class="tag">${s.category}</span></div><button class="secondary" style="margin-top:13px" data-request="${s.title}">${buttonLabel}</button></article>`}
@@ -59,4 +80,6 @@ document.addEventListener('click',e=>{
  const prog=e.target.closest('[data-progress]');if(prog){showToast('Progress update saved for this demo session');return;}
 });
 document.getElementById('profileButton').onclick=()=>{currentPage='profile';render()};
-render();
+document.getElementById('logoutButton').onclick=logout;
+document.addEventListener('click',e=>{const auth=e.target.closest('[data-auth]');if(auth){authMode=auth.dataset.auth;renderAuth();}});
+if(currentUser){enterApp()}else{renderAuth()}
